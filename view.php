@@ -25,6 +25,18 @@ foreach ($result as $column) {
 // Fetch all data from the trackingData table
 $stmt = $db->query("SELECT * FROM trackingData");
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+function wrapUrlInAnchor($str) {
+    $str = htmlspecialchars($str);
+
+    // Check if the string contains "http:" or "https:"
+    if (preg_match('/\bhttps?:\/\/\S+/i', $str)) {
+        // Wrap the URL with <a> tag
+        return '<a href="' . $str . '" target="_blank">' . $str . '</a>';
+    }
+    // Return the string as it is if no URL is found
+    return $str;
+}
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +92,7 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($data as $row) {
             echo "<tr>";
             foreach ($columns as $column) {
-                echo "<td>" . htmlspecialchars($row[$column] ?? '') . "</td>";
+                echo "<td>" . wrapUrlInAnchor($row[$column] ?? '') . "</td>";
             }
             echo "</tr>";
         }

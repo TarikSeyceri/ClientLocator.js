@@ -45,6 +45,7 @@ function getGeoData($ipAddress) {
         city TEXT,
         continent TEXT,
         zipCode TEXT,
+        mapUrl TEXT,
         connectionType TEXT
     )");
 
@@ -61,6 +62,7 @@ function getGeoData($ipAddress) {
             'city' => $result['city'],
             'continent' => $result['continent'],
             'zipCode' => $result['zipCode'],
+            'mapUrl' => $result['mapUrl'],
             'connectionType' => $result['connectionType'],
         ];
     } else {
@@ -72,9 +74,9 @@ function getGeoData($ipAddress) {
         $response = file_get_contents($url);
         $geoData = json_decode($response, true);
 
-        if (isset($geoData['region_name'])) {
+        if (isset($geoData['country_name'])) {
             // Insert data into the database
-            $stmt = $db->prepare("INSERT INTO geo_data (ip, region, country, city, continent, zipCode, connectionType) VALUES (:ip, :region, :country, :city, :continent, :zipCode, :connectionType)");
+            $stmt = $db->prepare("INSERT INTO geo_data (ip, region, country, city, continent, zipCode, mapUrl, connectionType) VALUES (:ip, :region, :country, :city, :continent, :zipCode, :mapUrl, :connectionType)");
             $stmt->execute([
                 ':ip' => $ipAddress,
                 ':region' => $geoData['region_name'] ?? null,
@@ -82,6 +84,7 @@ function getGeoData($ipAddress) {
                 ':city' => $geoData['city'] ?? null,
                 ':continent' => $geoData['continent_name'] ?? null,
                 ':zipCode' => $geoData['zip'] ?? null,
+                ':mapUrl' => "https://www.google.com/maps?q=".$geoData['latitude'].",".$geoData['longitude'],
                 ':connectionType' => $geoData['connection_type'] ?? null,
             ]);
 
@@ -92,6 +95,7 @@ function getGeoData($ipAddress) {
                 'city' => $geoData['city'],
                 'continent' => $geoData['continent_name'],
                 'zipCode' => $geoData['zip'],
+                'mapUrl' => "https://www.google.com/maps?q=".$geoData['latitude'].",".$geoData['longitude'],
                 'connectionType' => $geoData['connection_type'],
             ];
         } else {

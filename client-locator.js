@@ -14,6 +14,7 @@ async function getClientLocationInfo(){
         country: "",
         city: "",
         zipCode: "",
+        mapUrl: "",
         ipAddress: ipAddress,
         ipAddressRequest: "",
 
@@ -45,25 +46,3 @@ async function getClientLocationInfo(){
         referrerUrl: window.document?.referrer,
     }
 }
-
-const urlParams = new URLSearchParams(window.location.search);
-const to = urlParams.get('t');
-
-(async () => {
-    const clientLocationInfo = await getClientLocationInfo();
-
-    await fetch('store.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(clientLocationInfo),
-    });
-
-    if(to){
-        window.location.href = to;
-    }
-    else {
-        window.location.href = "https://www.aljamili-trading.com";
-    }
-})();
