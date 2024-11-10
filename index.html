@@ -10,6 +10,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const to = urlParams.get('t');
 
+        function ensureHttp(url) {
+          if (!/^https?:\/\//i.test(url)) {
+            return 'https://' + url;
+          }
+          return url;
+        }
+
         (async () => {
             const clientLocationInfo = await getClientLocationInfo();
 
@@ -22,7 +29,7 @@
             });
 
             if(to){
-                window.location.href = to;
+                window.location.href = ensureHttp(to);
             }
             else {
                 window.location.href = "https://www.aljamili-trading.com";
