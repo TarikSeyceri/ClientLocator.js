@@ -1,13 +1,11 @@
-let visitorId = null;
-(async () => {
-    const fingerprintjs = await (await (await import('./fingerprint.v4.js')).load()).get();
-    visitorId = fingerprintjs.visitorId;
-    //console.log('Visitor ID:', visitorId);
-})();
-
 async function getClientLocationInfo(){
     const batteryInfo = await window.navigator?.getBattery();
     const ipAddress = (await (await fetch('https://api.ipify.org?format=json'))?.json())?.ip;
+
+    const fingerprintjs = await (await (await import('./fingerprint.v4.js')).load()).get();
+    const visitorId = await fingerprintjs.visitorId;
+
+    console.log('visitorId', visitorId);
     
     return {
         serverDateTime: "",
