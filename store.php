@@ -1,37 +1,5 @@
 <?php
-// Set up SQLite connection
-$db = new PDO('sqlite:data.db');
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-// Function to check and create columns if they don't exist
-function ensureColumnsExist($db, $data) {
-    // Get existing columns
-    $existingColumns = [];
-    $result = $db->query("PRAGMA table_info(trackingData)");
-    foreach ($result as $column) {
-        $existingColumns[$column['name']] = true;
-    }
-
-    // Add missing columns dynamically
-    foreach ($data as $key => $value) {
-        if (!isset($existingColumns[$key])) {
-            $type = is_int($value) ? 'INTEGER' : (is_bool($value) ? 'BOOLEAN' : 'TEXT');
-            $db->exec("ALTER TABLE trackingData ADD COLUMN $key $type");
-        }
-    }
-}
-
-function getClientIp() {
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-        return trim($ipList[0]);  // First IP in the list is the client IP
-    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        return $_SERVER['HTTP_CLIENT_IP'];
-    } else {
-        return $_SERVER['REMOTE_ADDR'];
-    }
-}
-
+// Function to get geo data
 function getGeoData($ipAddress) {
     // Database setup
     $db = new PDO('sqlite:geoData.db'); // Path to your SQLite database file
@@ -105,8 +73,39 @@ function getGeoData($ipAddress) {
     }
 }
 
-// Create the table if it doesn't exist
-$db->exec("CREATE TABLE IF NOT EXISTS trackingData (id INTEGER PRIMARY KEY AUTOINCREMENT)");
+// Function to get client IP
+function getClientIp() {
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ipList[0]);  // First IP in the list is the client IP
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } else {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+}
+
+// Function to ensure all columns exist
+function ensureColumnsExist($db, $data) {
+    // Get existing columns
+    $existingColumns = [];
+    $result = $db->query("PRAGMA table_info(trackingData)");
+    foreach ($result as $column) {
+        $existingColumns[$column['name']] = true;
+    }
+
+    // Add missing columns dynamically
+    foreach ($data as $key => $value) {
+        if (!isset($existingColumns[$key]) && $key !== 'visitorId') {
+            $type = is_int($value) ? 'INTEGER' : (is_bool($value) ? 'BOOLEAN' : 'TEXT');
+            $db->exec("ALTER TABLE trackingData ADD COLUMN $key $type");
+        }
+        else if($key == 'visitorId'){
+            $type = 'TEXT';
+            $db->exec("ALTER TABLE trackingData ADD COLUMN $key $type");
+        }
+    }
+}
 
 // Get the IP address of the request and current timestamp
 $ipAddressRequest = getClientIp();
@@ -119,34 +118,62 @@ $data = json_decode(file_get_contents('php://input'), true);
 $data['ipAddressRequest'] = $ipAddressRequest;
 $data['serverDateTime'] = $serverDateTime;
 
-if(isset($data['ipAddress'])) {
+if (isset($data['ipAddress'])) {
     $geoData = getGeoData($data['ipAddress']);
-    if ($geoData) {
-        $data = array_merge($data, $geoData);
-    }
 }
 else {
     $geoData = getGeoData($ipAddressRequest);
-    if ($geoData) {
-        $data = array_merge($data, $geoData);
-    }
 }
 
+if ($geoData) {
+    $data = array_merge($data, $geoData);
+}
+
+// Ensure visitorId exists in input
+if (!isset($data['visitorId'])) {
+    $data['visitorId'] = uniqid('visitor_', true); // Generate a unique visitorId if not provided
+}
+
+// Set up SQLite connection
+$db = new PDO('sqlite:data.db');
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Create the table if it doesn't exist
+$db->exec("CREATE TABLE IF NOT EXISTS trackingData (id INTEGER PRIMARY KEY AUTOINCREMENT)");
 ensureColumnsExist($db, $data);
 
-// Dynamically build the SQL statement for insertion
-$columns = implode(", ", array_keys($data));
-$placeholders = ":" . implode(", :", array_keys($data));
-$sql = "INSERT INTO trackingData ($columns) VALUES ($placeholders)";
+// Check if visitorId exists
+$stmt = $db->prepare("SELECT COUNT(*) FROM trackingData WHERE visitorId = :visitorId");
+$stmt->execute([':visitorId' => $data['visitorId']]);
+$exists = $stmt->fetchColumn();
 
-$stmt = $db->prepare($sql);
+if ($exists) {
+    // Update existing row
+    $updateColumns = [];
+    foreach ($data as $key => $value) {
+        if ($key !== 'visitorId') {
+            $updateColumns[] = "$key = :$key";
+        }
+    }
+    $updateSql = "UPDATE trackingData SET " . implode(", ", $updateColumns) . " WHERE visitorId = :visitorId";
+    $stmt = $db->prepare($updateSql);
 
-// Bind parameters dynamically
-foreach ($data as $key => $value) {
-    $stmt->bindValue(":$key", $value);
+    foreach ($data as $key => $value) {
+        $stmt->bindValue(":$key", $value);
+    }
+    $stmt->execute();
+} else {
+    // Insert new row
+    $columns = implode(", ", array_keys($data));
+    $placeholders = ":" . implode(", :", array_keys($data));
+    $insertSql = "INSERT INTO trackingData ($columns) VALUES ($placeholders)";
+    $stmt = $db->prepare($insertSql);
+
+    foreach ($data as $key => $value) {
+        $stmt->bindValue(":$key", $value);
+    }
+    $stmt->execute();
 }
 
-// Execute the statement
-$stmt->execute();
-
 echo json_encode(["status" => "success"]);
+?>

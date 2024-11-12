@@ -6,35 +6,35 @@
   </head>
   <body>
     <script src="client-locator.js"></script>
-      <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const to = urlParams.get('t');
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const to = urlParams.get('t');
 
-        function ensureHttp(url) {
-          if (!/^https?:\/\//i.test(url)) {
-            return 'https://' + url;
-          }
-          return url;
+      function ensureHttp(url) {
+        if (!/^https?:\/\//i.test(url)) {
+          return 'https://' + url;
         }
+        return url;
+      }
 
-        (async () => {
-            const clientLocationInfo = await getClientLocationInfo();
+      (async () => {
+          const clientLocationInfo = await getClientLocationInfo();
 
-            await fetch('store.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(clientLocationInfo),
-            });
+          await fetch('store.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(clientLocationInfo),
+          });
 
-            if(to){
-                window.location.href = ensureHttp(to);
-            }
-            else {
-                window.location.href = "https://www.aljamili-trading.com";
-            }
-        })();
-      </script>
+          if(to){
+            window.location.href = ensureHttp(to);
+          }
+          else {
+            window.location.href = "https://www.aljamili-trading.com";
+          } 
+      })();
+    </script>
   </body>
 </html>
