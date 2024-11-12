@@ -100,7 +100,7 @@ function ensureColumnsExist($db, $data) {
             $type = is_int($value) ? 'INTEGER' : (is_bool($value) ? 'BOOLEAN' : 'TEXT');
             $db->exec("ALTER TABLE trackingData ADD COLUMN $key $type");
         }
-        else if($key == 'visitorId'){
+        else if(!isset($existingColumns[$key]) && $key == 'visitorId'){
             $type = 'TEXT';
             $db->exec("ALTER TABLE trackingData ADD COLUMN $key $type");
         }
