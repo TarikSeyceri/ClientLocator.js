@@ -15,6 +15,17 @@ if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW']) ||
 $db = new PDO('sqlite:data.db');
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+// Check if the Empty Table button was clicked
+if (isset($_POST['emptyTable'])) {
+    // Prepare and execute the query to delete all data from the table
+    $stmt = $db->prepare("DELETE FROM trackingData");
+    $stmt->execute();
+
+    // Redirect to the same page to refresh the data after deletion
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
 // Fetch all column names dynamically
 $columns = [];
 $result = $db->query("PRAGMA table_info(trackingData)");
@@ -75,9 +86,33 @@ function wrapUrlInAnchor($str) {
             text-align: center;
             color: #4CAF50;
         }
+
+        .empty-table-btn {
+            background-color: #f44336; /* Red background */
+            color: white; /* White text */
+            font-size: 16px; /* Font size */
+            padding: 10px 20px; /* Padding */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s ease; /* Smooth transition for background color */
+            font-weight: bold; /* Bold text */
+        }
+        .empty-table-btn:hover {
+            background-color: #d32f2f; /* Darker red on hover */
+        }
+        .empty-table-btn:active {
+            background-color: #b71c1c; /* Even darker red when clicked */
+        }
     </style>
 </head>
 <body>
+    <form method="POST" action="">
+        <button type="submit" name="emptyTable" class="empty-table-btn" onclick="return confirm('Are you sure you want to empty the table?');">Empty Table</button>
+    </form>
+    
+    <br/>
+
     <table>
         <tr>
             <?php
