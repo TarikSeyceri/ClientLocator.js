@@ -39,7 +39,12 @@ function getGeoData($ipAddress) {
         $url = "http://api.ipstack.com/{$ipAddress}?access_key={$accessKey}";
 
         // Make API request
-        $response = file_get_contents($url);
+        $response = @file_get_contents($url);
+
+        if ($response === false) {
+            return null;
+        }
+
         $geoData = json_decode($response, true);
 
         if (isset($geoData['country_name'])) {

