@@ -1,4 +1,7 @@
 <?php
+
+include 'config.php';
+
 // Function to get geo data
 function getGeoData($ipAddress) {
     // Database setup
@@ -35,7 +38,7 @@ function getGeoData($ipAddress) {
         ];
     } else {
         // Data not found, fetch from IPStack API
-        $accessKey = '8b7a0f896889898da5828c5468a61172';
+        $accessKey = IPSTACK_API_ACCESS_KEY;
         $url = "http://api.ipstack.com/{$ipAddress}?access_key={$accessKey}";
 
         // Make API request

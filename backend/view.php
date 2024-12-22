@@ -1,4 +1,5 @@
 <?php
+
 // Include configuration
 include 'config.php';
 
