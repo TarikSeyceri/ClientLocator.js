@@ -1,6 +1,6 @@
 # ClientLocator.js
 
-This script is used to redirect a client to a specific URL, but also at the same time, it captures client's location information and sends it to the backend for storage. The purpose of this tool is to collect visitor's location details using JavaScript and some APIs. The collected data can be used for analytics, security, or personalization purposes.
+This script is developed to redirect clients to a dynamically specified URL while simultaneously capturing their location information and sending it to the backend for storage. The collected data can be utilized for analytical and personalization purposes.
 
 ## Features
 
