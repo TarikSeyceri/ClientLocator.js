@@ -1,5 +1,13 @@
 # ClientLocator.js
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/tarikseyceri)
+
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](client-locator.js)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?logo=php&logoColor=white)](backend/)
+[![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)](backend/store.php)
+[![FingerprintJS v4.5.1](https://img.shields.io/badge/FingerprintJS-v4.5.1-F35B22)](https://fingerprint.com/)
+
 This script is developed to redirect clients to a dynamically specified URL while simultaneously capturing their location information and sending it to the backend for storage. The collected data can be utilized for analytical and personalization purposes.
 
 ## Features
